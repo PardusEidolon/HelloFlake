@@ -6,9 +6,18 @@
   outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem
       (system:
-        let pkgs = nixpkgs.legacyPackages.${system}; in
-        {
-          devShells.default = import ./shell.nix { inherit pkgs; };
-        }
+        let 
+			pkgs = nixpkgs.legacyPackages.${system};
+			myDerivation = with pkgs;
+				stdenv.mkDerivation{
+					name = "hey";
+					src = self;
+					buildInputs = [ ghc ];
+					buildPhase = "ghc -o hello ./Main.hs";
+				};
+		in
+        	{
+          		packages.default = myDerivation;
+        	}
       );
 }
