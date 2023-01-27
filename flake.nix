@@ -9,15 +9,17 @@
         let 
 			pkgs = nixpkgs.legacyPackages.${system};
 			myDerivation = with pkgs;
-				stdenv.mkDerivation{
-					name = "hey";
-					src = self;
-					buildInputs = [ ghc ];
-					buildPhase = "ghc -o hello ./Main.hs";
-				};
+				derivation {
+        			name = "hello";
+        			src = ./Main.hs;
+					args = [./builder.sh];
+					builder = [ bash ];
+					buildInputs = [ghc];
+					system = system;
+      			};
 		in
         	{
-          		packages.default = myDerivation;
+				packages.default = myDerivation;
         	}
       );
 }
