@@ -1,20 +1,19 @@
 {
-  description = "A very basic flake";
-  
-  inputs.flake-utils.url = "github:numtide/flake-utils";
+  description = "A flake for building Hello World";
 
-  outputs = { self, nixpkgs, flake-utils }: {
-      flake-utils.lib.eachDefaultSystem (system:
-	let
-	  myPackage = with nixpkgs; 
-	  	stdenv.mkDerivation {
-		name = "Hello";
-		src = self;
-		buildInputs = [ ghc ];
-		buildPhase = "ghc -o hello ./hello.hs";
-		};
-	in
-	  myPackages
-      )
+  inputs.nixpkgs.url = github:NixOS/nixpkgs/nixos-20.03;
+
+  outputs = { self, nixpkgs }: {
+
+    defaultPackage.x86_64-darwin =
+      # Notice the reference to nixpkgs here.
+      with import nixpkgs { system = "x86_64-linux"; };
+      stdenv.mkDerivation {
+        name = "hello";
+        src = self;
+        buildPhase = "gcc -o hello ./hello.c";
+        installPhase = "mkdir -p $out/bin; install -t $out/bin hello";
+      };
+
   };
 }
